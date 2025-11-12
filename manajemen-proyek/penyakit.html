@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Penyakit Berdasarkan Gejala</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-brand span {
+            margin-left: 10px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .navbar-menu a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .navbar-menu a:hover {
+            color: #667eea;
+        }
+
+        .navbar-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .navbar-menu a:hover::after {
+            width: 100%;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h2::before {
+            content: "▶";
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .symptom-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .symptom-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .symptom-item label {
+            cursor: pointer;
+            user-select: none;
+            font-size: 14px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .disease-result {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .disease-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .probability {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .advice-box {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(143, 138, 138, 0.5);
+        }
+
+        .advice-box strong {
+            font-size: 16px;
+        }
+
+        .advice-box p {
+            margin-top: 10px;
+            line-height: 1.6;
+            
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                gap: 15px;
+                font-size: 14px;
+            }
+
+            .navbar-brand {
+                font-size: 20px;
+            }
+
+            .symptoms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-brand">
+                
+                <span><a href="index.html">Puskesmas Aras Kabu</a></span>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="index.html">Beranda</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>🏥 Prediksi Penyakit</h1>
+                <p>Sistem Diagnosa Menggunakan Algoritma Naive Bayes</p>
+            </div>
+
+            <div class="content">
+                <div class="section">
+                    <h2>Pilih Gejala yang Anda Alami</h2>
+                    <div class="symptoms-grid" id="symptomsGrid"></div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn" onclick="predictDisease()">🔍 Prediksi Penyakit</button>
+                </div>
+
+                <div class="result" id="result"></div>
+
+                <div class="info-box">
+                    <strong>ℹ️ Catatan:</strong> Sistem ini hanya sebagai referensi awal. Untuk diagnosa yang akurat, silakan konsultasi dengan dokter profesional.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Data training untuk Naive Bayes
+    const trainingData = [
+        { disease: 'Flu', symptoms: ['demam', 'batuk', 'pilek', 'sakit_kepala', 'lelah'] },
+        { disease: 'Flu', symptoms: ['demam', 'batuk', 'pilek', 'nyeri_otot'] },
+        { disease: 'Flu', symptoms: ['demam', 'batuk', 'sakit_tenggorokan', 'lelah'] },
+        { disease: 'Demam Berdarah', symptoms: ['demam', 'sakit_kepala', 'nyeri_otot', 'ruam', 'mual'] },
+        { disease: 'Demam Berdarah', symptoms: ['demam', 'nyeri_sendi', 'ruam', 'mual'] },
+        { disease: 'Demam Berdarah', symptoms: ['demam', 'sakit_kepala', 'nyeri_otot', 'muntah'] },
+        { disease: 'Tipes', symptoms: ['demam', 'sakit_perut', 'mual', 'muntah', 'diare'] },
+        { disease: 'Tipes', symptoms: ['demam', 'sakit_kepala', 'sakit_perut', 'lelah'] },
+        { disease: 'Tipes', symptoms: ['demam', 'sakit_perut', 'mual', 'lelah'] },
+        { disease: 'Maag', symptoms: ['sakit_perut', 'mual', 'muntah', 'kembung'] },
+        { disease: 'Maag', symptoms: ['sakit_perut', 'mual', 'kembung'] },
+        { disease: 'Maag', symptoms: ['sakit_perut', 'muntah', 'kembung'] },
+        { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'lelah', 'sakit_kepala'] },
+        { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'hilang_penciuman'] },
+        { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'sakit_tenggorokan'] }
+    ];
+
+    // Daftar semua gejala
+    const allSymptoms = [
+        { id: 'demam', label: 'Demam' },
+        { id: 'batuk', label: 'Batuk' },
+        { id: 'pilek', label: 'Pilek' },
+        { id: 'sakit_kepala', label: 'Sakit Kepala' },
+        { id: 'sakit_tenggorokan', label: 'Sakit Tenggorokan' },
+        { id: 'sesak_napas', label: 'Sesak Napas' },
+        { id: 'lelah', label: 'Lelah' },
+        { id: 'nyeri_otot', label: 'Nyeri Otot' },
+        { id: 'nyeri_sendi', label: 'Nyeri Sendi' },
+        { id: 'sakit_perut', label: 'Sakit Perut' },
+        { id: 'mual', label: 'Mual' },
+        { id: 'muntah', label: 'Muntah' },
+        { id: 'diare', label: 'Diare' },
+        { id: 'kembung', label: 'Kembung' },
+        { id: 'ruam', label: 'Ruam' },
+        { id: 'hilang_penciuman', label: 'Hilang Penciuman' }
+    ];
+
+    // Saran berdasarkan penyakit
+    const diseaseAdvice = {
+        'Flu': 'Istirahat yang cukup, minum air hangat, dan konsumsi vitamin C. Jika demam tinggi atau gejala memburuk, segera periksa ke dokter.',
+        'Demam Berdarah': 'Segera perbanyak minum air putih, istirahat total, dan lakukan pemeriksaan darah. Hindari obat pereda nyeri yang mengandung aspirin.',
+        'Tipes': 'Konsumsi makanan lunak, banyak minum air putih, dan hindari makanan pedas. Segera periksa ke dokter untuk pengobatan antibiotik yang tepat.',
+        'Maag': 'Hindari makanan pedas, asam, dan kafein. Makan teratur dalam porsi kecil dan jangan biarkan perut kosong terlalu lama.',
+        'COVID-19': 'Lakukan isolasi mandiri, gunakan masker, minum vitamin, dan perbanyak istirahat. Segera periksa ke fasilitas kesehatan jika sesak napas meningkat.'
+    };
+
+    // Render checkbox gejala
+    function renderSymptoms() {
+        const grid = document.getElementById('symptomsGrid');
+        grid.innerHTML = allSymptoms.map(symptom => `
+            <div class="symptom-item">
+                <input type="checkbox" id="${symptom.id}" value="${symptom.id}">
+                <label for="${symptom.id}">${symptom.label}</label>
+            </div>
+        `).join('');
+    }
+
+    // Algoritma Naive Bayes
+    function calculateNaiveBayes(selectedSymptoms) {
+        const diseases = [...new Set(trainingData.map(d => d.disease))];
+        const results = {};
+
+        diseases.forEach(disease => {
+            const diseaseCount = trainingData.filter(d => d.disease === disease).length;
+            const priorProb = diseaseCount / trainingData.length;
+
+            let likelihood = 1;
+            selectedSymptoms.forEach(symptom => {
+                const symptomInDisease = trainingData.filter(d =>
+                    d.disease === disease && d.symptoms.includes(symptom)
+                ).length;
+
+                const prob = (symptomInDisease + 1) / (diseaseCount + 2);
+                likelihood *= prob;
+            });
+
+            results[disease] = likelihood * priorProb;
+        });
+
+        const total = Object.values(results).reduce((a, b) => a + b, 0);
+        Object.keys(results).forEach(disease => {
+            results[disease] = (results[disease] / total) * 100;
+        });
+
+        return results;
+    }
+
+    // Prediksi penyakit
+    function predictDisease() {
+        const selectedSymptoms = allSymptoms
+            .filter(symptom => document.getElementById(symptom.id).checked)
+            .map(symptom => symptom.id);
+
+        if (selectedSymptoms.length === 0) {
+            alert('⚠️ Silakan pilih minimal satu gejala!');
+            return;
+        }
+
+        const predictions = calculateNaiveBayes(selectedSymptoms);
+        const sortedPredictions = Object.entries(predictions)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3);
+
+        const topDisease = sortedPredictions[0][0];
+        const advice = diseaseAdvice[topDisease] || 'Segera konsultasi dengan dokter untuk pemeriksaan lebih lanjut.';
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `
+            <h3>📊 Hasil Prediksi</h3>
+            <p style="margin-bottom: 15px; font-size: 14px;">Berdasarkan gejala yang Anda pilih:</p>
+            ${sortedPredictions.map(([disease, prob]) => `
+                <div class="disease-result">
+                    <div class="disease-name">${disease}</div>
+                    <div class="probability">Probabilitas: ${prob.toFixed(2)}%</div>
+                </div>
+            `).join('')}
+            <div class="advice-box">
+                <strong>💡 Saran untuk ${topDisease}:</strong>
+                <p>${advice}</p>
+            </div>
+        `;
+        resultDiv.classList.add('show');
+    }
+
+    // Inisialisasi
+    renderSymptoms();
+    </script>
+
+</body>
+</html>
