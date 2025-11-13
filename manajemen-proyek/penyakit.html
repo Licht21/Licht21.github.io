@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediksi Penyakit Berdasarkan Gejala</title>
+    <title>Puskesmas Aras Kabu - Sistem Prediksi Penyakit</title>
     <style>
         * {
             margin: 0;
@@ -15,7 +15,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 0;
         }
 
         .navbar {
@@ -56,6 +55,7 @@
             display: flex;
             gap: 30px;
             list-style: none;
+            align-items: center;
         }
 
         .navbar-menu a {
@@ -85,12 +85,28 @@
             width: 100%;
         }
 
+        .btn-logout {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
         .main-content {
             padding: 20px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -119,24 +135,158 @@
             padding: 30px;
         }
 
-        .section {
+        /* Login Page */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-header {
+            text-align: center;
             margin-bottom: 30px;
         }
 
-        .section h2 {
+        .login-header h2 {
             color: #667eea;
-            margin-bottom: 15px;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
+            font-size: 28px;
+            margin-bottom: 10px;
         }
 
-        .section h2::before {
-            content: "▶";
-            margin-right: 10px;
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 14px;
+            transition: all 0.3s;
         }
 
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin-top: 10px;
+        }
+
+        /* Admin Panel */
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-inline {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-delete {
+            background: #f5576c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background: #e04456;
+        }
+
+        /* User Diagnosis Page */
         .symptoms-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -171,28 +321,6 @@
             cursor: pointer;
             user-select: none;
             font-size: 14px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn:active {
-            transform: translateY(0);
         }
 
         .result {
@@ -248,7 +376,7 @@
             background: rgba(255, 255, 255, 0.3);
             padding: 15px;
             border-radius: 10px;
-            border: 2px solid rgba(143, 138, 138, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.5);
         }
 
         .advice-box strong {
@@ -258,7 +386,6 @@
         .advice-box p {
             margin-top: 10px;
             line-height: 1.6;
-            
         }
 
         .info-box {
@@ -271,14 +398,88 @@
             color: #333;
         }
 
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h2::before {
+            content: "▶";
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         @media (max-width: 768px) {
             .navbar-menu {
                 gap: 15px;
                 font-size: 14px;
             }
 
-            .navbar-brand {
-                font-size: 20px;
+            .form-inline {
+                grid-template-columns: 1fr;
             }
 
             .symptoms-grid {
@@ -288,174 +489,592 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar" style="display: none;">
         <div class="navbar-content">
             <div class="navbar-brand">
                 
-                <span><a href="index.html">Puskesmas Aras Kabu</a></span>
+                <span>Puskesmas Aras Kabu</span>
             </div>
             <ul class="navbar-menu">
-                <li><a href="index.html">Beranda</a></li>
+                <li><a href="#" onclick="showPage('home')">Beranda</a></li>
+                <li id="adminLink" style="display: none;"><a href="#" onclick="showPage('admin')">Admin Panel</a></li>
+                <li id="loginLink"><a href="#" onclick="showPage('login')">Login Admin</a></li>
+                <li id="logoutBtn" style="display: none;">
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </li>
             </ul>
         </div>
     </nav>
 
     <div class="main-content">
-        <div class="container">
-            <div class="header">
-                <h1>🏥 Prediksi Penyakit</h1>
-                <p>Sistem Diagnosa Menggunakan Algoritma Naive Bayes</p>
+        <!-- Login Page -->
+        <div id="loginPage" class="page active">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>🏥 MediPredict</h2>
+                    <p>Login Admin Panel</p>
+                </div>
+                <div id="loginAlert"></div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Masukkan username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Masukkan password">
+                </div>
+                <button class="btn" onclick="login()">🔐 Login</button>
+                <button class="btn btn-secondary" onclick="showPage('home')">👤 Masuk sebagai User</button>
+                <div style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">
+                    <!-- <p>Default: admin / admin123</p> -->
+                </div>
             </div>
+        </div>
 
-            <div class="content">
-                <div class="section">
-                    <h2>Pilih Gejala yang Anda Alami</h2>
-                    <div class="symptoms-grid" id="symptomsGrid"></div>
+        <!-- Home/Diagnosis Page -->
+        <div id="homePage" class="page">
+            <div class="container">
+                <div class="header">
+                    <h1>🏥 Prediksi Penyakit</h1>
+                    <p>Sistem Diagnosa Menggunakan Algoritma Naive Bayes</p>
                 </div>
 
-                <div style="text-align: center;">
-                    <button class="btn" onclick="predictDisease()">🔍 Prediksi Penyakit</button>
+                <div class="content">
+                    <div class="section">
+                        <h2>Pilih Gejala yang Anda Alami</h2>
+                        <div class="symptoms-grid" id="symptomsGrid"></div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button class="btn" onclick="predictDisease()">🔍 Prediksi Penyakit</button>
+                    </div>
+
+                    <div class="result" id="result"></div>
+
+                    <div class="info-box">
+                        <strong>ℹ️ Catatan:</strong> Sistem ini hanya sebagai referensi awal. Untuk diagnosa yang akurat, silakan konsultasi dengan dokter profesional.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Page -->
+        <div id="adminPage" class="page">
+            <div class="container">
+                <div class="header">
+                    <h1>⚙️ Admin Panel</h1>
+                    <p>Kelola Data Gejala, Penyakit, dan Saran</p>
                 </div>
 
-                <div class="result" id="result"></div>
+                <div class="content">
+                    <div id="adminAlert"></div>
 
-                <div class="info-box">
-                    <strong>ℹ️ Catatan:</strong> Sistem ini hanya sebagai referensi awal. Untuk diagnosa yang akurat, silakan konsultasi dengan dokter profesional.
+                    <div class="admin-tabs">
+                        <button class="tab active" onclick="switchTab('symptoms')">Kelola Gejala</button>
+                        <button class="tab" onclick="switchTab('diseases')">Kelola Penyakit</button>
+                        <button class="tab" onclick="switchTab('training')">Data Training</button>
+                    </div>
+
+                    <!-- Tab Gejala -->
+                    <div id="symptomsTab" class="tab-content active">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">Tambah Gejala Baru</h3>
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label>ID Gejala</label>
+                                <input type="text" id="symptomId" placeholder="contoh: batuk_kering">
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Gejala</label>
+                                <input type="text" id="symptomLabel" placeholder="contoh: Batuk Kering">
+                            </div>
+                        </div>
+                        <button class="btn" onclick="addSymptom()">➕ Tambah Gejala</button>
+
+                        <h3 style="color: #667eea; margin: 30px 0 15px;">Daftar Gejala</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>ID Gejala</th>
+                                    <th>Nama Gejala</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="symptomsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tab Penyakit -->
+                    <div id="diseasesTab" class="tab-content">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">Tambah Penyakit Baru</h3>
+                        <div class="form-group">
+                            <label>Nama Penyakit</label>
+                            <input type="text" id="diseaseName" placeholder="contoh: Demam Berdarah">
+                        </div>
+                        <div class="form-group">
+                            <label>Saran Pengobatan</label>
+                            <textarea id="diseaseAdvice" placeholder="Masukkan saran pengobatan untuk penyakit ini..."></textarea>
+                        </div>
+                        <button class="btn" onclick="addDisease()">➕ Tambah Penyakit</button>
+
+                        <h3 style="color: #667eea; margin: 30px 0 15px;">Daftar Penyakit</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Penyakit</th>
+                                    <th>Saran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="diseasesTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tab Data Training -->
+                    <div id="trainingTab" class="tab-content">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">Tambah Data Training</h3>
+                        <div class="form-group">
+                            <label>Pilih Penyakit</label>
+                            <select id="trainingDisease" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px;">
+                                <option value="">-- Pilih Penyakit --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Pilih Gejala-gejala</label>
+                            <div id="trainingSymptoms" class="checkbox-group"></div>
+                        </div>
+                        <button class="btn" onclick="addTrainingData()">➕ Tambah Data Training</button>
+
+                        <h3 style="color: #667eea; margin: 30px 0 15px;">Data Training</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Penyakit</th>
+                                    <th>Gejala</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trainingTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-    // Data training untuk Naive Bayes
-    const trainingData = [
-        { disease: 'Flu', symptoms: ['demam', 'batuk', 'pilek', 'sakit_kepala', 'lelah'] },
-        { disease: 'Flu', symptoms: ['demam', 'batuk', 'pilek', 'nyeri_otot'] },
-        { disease: 'Flu', symptoms: ['demam', 'batuk', 'sakit_tenggorokan', 'lelah'] },
-        { disease: 'Demam Berdarah', symptoms: ['demam', 'sakit_kepala', 'nyeri_otot', 'ruam', 'mual'] },
-        { disease: 'Demam Berdarah', symptoms: ['demam', 'nyeri_sendi', 'ruam', 'mual'] },
-        { disease: 'Demam Berdarah', symptoms: ['demam', 'sakit_kepala', 'nyeri_otot', 'muntah'] },
-        { disease: 'Tipes', symptoms: ['demam', 'sakit_perut', 'mual', 'muntah', 'diare'] },
-        { disease: 'Tipes', symptoms: ['demam', 'sakit_kepala', 'sakit_perut', 'lelah'] },
-        { disease: 'Tipes', symptoms: ['demam', 'sakit_perut', 'mual', 'lelah'] },
-        { disease: 'Maag', symptoms: ['sakit_perut', 'mual', 'muntah', 'kembung'] },
-        { disease: 'Maag', symptoms: ['sakit_perut', 'mual', 'kembung'] },
-        { disease: 'Maag', symptoms: ['sakit_perut', 'muntah', 'kembung'] },
-        { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'lelah', 'sakit_kepala'] },
-        { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'hilang_penciuman'] },
-        { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'sakit_tenggorokan'] }
-    ];
+        // Data Storage (menggunakan localStorage untuk persistensi)
+        let currentUser = null;
+        
+        // Initialize default data
+        let allSymptoms = JSON.parse(localStorage.getItem('symptoms')) || [
+            { id: 'demam', label: 'Demam' },
+            { id: 'batuk', label: 'Batuk' },
+            { id: 'pilek', label: 'Pilek' },
+            { id: 'sakit_kepala', label: 'Sakit Kepala' },
+            { id: 'sakit_tenggorokan', label: 'Sakit Tenggorokan' },
+            { id: 'sesak_napas', label: 'Sesak Napas' },
+            { id: 'lelah', label: 'Lelah' },
+            { id: 'nyeri_otot', label: 'Nyeri Otot' },
+            { id: 'nyeri_sendi', label: 'Nyeri Sendi' },
+            { id: 'sakit_perut', label: 'Sakit Perut' },
+            { id: 'mual', label: 'Mual' },
+            { id: 'muntah', label: 'Muntah' },
+            { id: 'diare', label: 'Diare' },
+            { id: 'kembung', label: 'Kembung' },
+            { id: 'ruam', label: 'Ruam' },
+            { id: 'hilang_penciuman', label: 'Hilang Penciuman' }
+        ];
 
-    // Daftar semua gejala
-    const allSymptoms = [
-        { id: 'demam', label: 'Demam' },
-        { id: 'batuk', label: 'Batuk' },
-        { id: 'pilek', label: 'Pilek' },
-        { id: 'sakit_kepala', label: 'Sakit Kepala' },
-        { id: 'sakit_tenggorokan', label: 'Sakit Tenggorokan' },
-        { id: 'sesak_napas', label: 'Sesak Napas' },
-        { id: 'lelah', label: 'Lelah' },
-        { id: 'nyeri_otot', label: 'Nyeri Otot' },
-        { id: 'nyeri_sendi', label: 'Nyeri Sendi' },
-        { id: 'sakit_perut', label: 'Sakit Perut' },
-        { id: 'mual', label: 'Mual' },
-        { id: 'muntah', label: 'Muntah' },
-        { id: 'diare', label: 'Diare' },
-        { id: 'kembung', label: 'Kembung' },
-        { id: 'ruam', label: 'Ruam' },
-        { id: 'hilang_penciuman', label: 'Hilang Penciuman' }
-    ];
+        let diseaseAdvice = JSON.parse(localStorage.getItem('diseaseAdvice')) || {
+            'Flu': 'Istirahat yang cukup, minum air hangat, dan konsumsi vitamin C. Jika demam tinggi atau gejala memburuk, segera periksa ke dokter.',
+            'Demam Berdarah': 'Segera perbanyak minum air putih, istirahat total, dan lakukan pemeriksaan darah. Hindari obat pereda nyeri yang mengandung aspirin.',
+            'Tipes': 'Konsumsi makanan lunak, banyak minum air putih, dan hindari makanan pedas. Segera periksa ke dokter untuk pengobatan antibiotik yang tepat.',
+            'Maag': 'Hindari makanan pedas, asam, dan kafein. Makan teratur dalam porsi kecil dan jangan biarkan perut kosong terlalu lama.',
+            'COVID-19': 'Lakukan isolasi mandiri, gunakan masker, minum vitamin, dan perbanyak istirahat. Segera periksa ke fasilitas kesehatan jika sesak napas meningkat.'
+        };
 
-    // Saran berdasarkan penyakit
-    const diseaseAdvice = {
-        'Flu': 'Istirahat yang cukup, minum air hangat, dan konsumsi vitamin C. Jika demam tinggi atau gejala memburuk, segera periksa ke dokter.',
-        'Demam Berdarah': 'Segera perbanyak minum air putih, istirahat total, dan lakukan pemeriksaan darah. Hindari obat pereda nyeri yang mengandung aspirin.',
-        'Tipes': 'Konsumsi makanan lunak, banyak minum air putih, dan hindari makanan pedas. Segera periksa ke dokter untuk pengobatan antibiotik yang tepat.',
-        'Maag': 'Hindari makanan pedas, asam, dan kafein. Makan teratur dalam porsi kecil dan jangan biarkan perut kosong terlalu lama.',
-        'COVID-19': 'Lakukan isolasi mandiri, gunakan masker, minum vitamin, dan perbanyak istirahat. Segera periksa ke fasilitas kesehatan jika sesak napas meningkat.'
-    };
+        let trainingData = JSON.parse(localStorage.getItem('trainingData')) || [
+            { disease: 'Flu', symptoms: ['demam', 'batuk', 'pilek', 'sakit_kepala', 'lelah'] },
+            { disease: 'Flu', symptoms: ['demam', 'batuk', 'pilek', 'nyeri_otot'] },
+            { disease: 'Flu', symptoms: ['demam', 'batuk', 'sakit_tenggorokan', 'lelah'] },
+            { disease: 'Demam Berdarah', symptoms: ['demam', 'sakit_kepala', 'nyeri_otot', 'ruam', 'mual'] },
+            { disease: 'Demam Berdarah', symptoms: ['demam', 'nyeri_sendi', 'ruam', 'mual'] },
+            { disease: 'Demam Berdarah', symptoms: ['demam', 'sakit_kepala', 'nyeri_otot', 'muntah'] },
+            { disease: 'Tipes', symptoms: ['demam', 'sakit_perut', 'mual', 'muntah', 'diare'] },
+            { disease: 'Tipes', symptoms: ['demam', 'sakit_kepala', 'sakit_perut', 'lelah'] },
+            { disease: 'Tipes', symptoms: ['demam', 'sakit_perut', 'mual', 'lelah'] },
+            { disease: 'Maag', symptoms: ['sakit_perut', 'mual', 'muntah', 'kembung'] },
+            { disease: 'Maag', symptoms: ['sakit_perut', 'mual', 'kembung'] },
+            { disease: 'Maag', symptoms: ['sakit_perut', 'muntah', 'kembung'] },
+            { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'lelah', 'sakit_kepala'] },
+            { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'hilang_penciuman'] },
+            { disease: 'COVID-19', symptoms: ['demam', 'batuk', 'sesak_napas', 'sakit_tenggorokan'] }
+        ];
 
-    // Render checkbox gejala
-    function renderSymptoms() {
-        const grid = document.getElementById('symptomsGrid');
-        grid.innerHTML = allSymptoms.map(symptom => `
-            <div class="symptom-item">
-                <input type="checkbox" id="${symptom.id}" value="${symptom.id}">
-                <label for="${symptom.id}">${symptom.label}</label>
-            </div>
-        `).join('');
-    }
-
-    // Algoritma Naive Bayes
-    function calculateNaiveBayes(selectedSymptoms) {
-        const diseases = [...new Set(trainingData.map(d => d.disease))];
-        const results = {};
-
-        diseases.forEach(disease => {
-            const diseaseCount = trainingData.filter(d => d.disease === disease).length;
-            const priorProb = diseaseCount / trainingData.length;
-
-            let likelihood = 1;
-            selectedSymptoms.forEach(symptom => {
-                const symptomInDisease = trainingData.filter(d =>
-                    d.disease === disease && d.symptoms.includes(symptom)
-                ).length;
-
-                const prob = (symptomInDisease + 1) / (diseaseCount + 2);
-                likelihood *= prob;
-            });
-
-            results[disease] = likelihood * priorProb;
-        });
-
-        const total = Object.values(results).reduce((a, b) => a + b, 0);
-        Object.keys(results).forEach(disease => {
-            results[disease] = (results[disease] / total) * 100;
-        });
-
-        return results;
-    }
-
-    // Prediksi penyakit
-    function predictDisease() {
-        const selectedSymptoms = allSymptoms
-            .filter(symptom => document.getElementById(symptom.id).checked)
-            .map(symptom => symptom.id);
-
-        if (selectedSymptoms.length === 0) {
-            alert('⚠️ Silakan pilih minimal satu gejala!');
-            return;
+        // Save data to localStorage
+        function  saveData() {
+            localStorage.setItem('symptoms', JSON.stringify(allSymptoms));
+            localStorage.setItem('diseaseAdvice', JSON.stringify(diseaseAdvice));
+            localStorage.setItem('trainingData', JSON.stringify(trainingData));
         }
 
-        const predictions = calculateNaiveBayes(selectedSymptoms);
-        const sortedPredictions = Object.entries(predictions)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3);
+        // Login function
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'admin123') {
+                currentUser = 'admin';
+                showAlert('loginAlert', 'Login berhasil!', 'success');
+                setTimeout(() => {
+                    showPage('admin');
+                    updateNavbar();
+                }, 1000);
+            } else {
+                showAlert('loginAlert', 'Username atau password salah!', 'error');
+            }
+        }
 
-        const topDisease = sortedPredictions[0][0];
-        const advice = diseaseAdvice[topDisease] || 'Segera konsultasi dengan dokter untuk pemeriksaan lebih lanjut.';
+        // Logout function
+        function logout() {
+            currentUser = null;
+            showPage('login');
+            updateNavbar();
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
 
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = `
-            <h3>📊 Hasil Prediksi</h3>
-            <p style="margin-bottom: 15px; font-size: 14px;">Berdasarkan gejala yang Anda pilih:</p>
-            ${sortedPredictions.map(([disease, prob]) => `
-                <div class="disease-result">
-                    <div class="disease-name">${disease}</div>
-                    <div class="probability">Probabilitas: ${prob.toFixed(2)}%</div>
+        // Update navbar based on login status
+        function updateNavbar() {
+            const navbar = document.getElementById('navbar');
+            const adminLink = document.getElementById('adminLink');
+            const loginLink = document.getElementById('loginLink');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            navbar.style.display = 'block';
+
+            if (currentUser === 'admin') {
+                adminLink.style.display = 'block';
+                loginLink.style.display = 'none';
+                logoutBtn.style.display = 'block';
+            } else {
+                adminLink.style.display = 'none';
+                loginLink.style.display = 'block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        // Show alert message
+        function showAlert(elementId, message, type) {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        // Page navigation
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            if (pageName === 'login') {
+                document.getElementById('loginPage').classList.add('active');
+                document.getElementById('navbar').style.display = 'none';
+            } else if (pageName === 'home') {
+                document.getElementById('homePage').classList.add('active');
+                updateNavbar();
+                renderUserSymptoms();
+            } else if (pageName === 'admin') {
+                if (currentUser !== 'admin') {
+                    showPage('login');
+                    return;
+                }
+                document.getElementById('adminPage').classList.add('active');
+                updateNavbar();
+                renderAdminData();
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            if (tabName === 'training') {
+                renderTrainingForm();
+            }
+        }
+
+        // Add Symptom
+        function addSymptom() {
+            const id = document.getElementById('symptomId').value.trim();
+            const label = document.getElementById('symptomLabel').value.trim();
+
+            if (!id || !label) {
+                showAlert('adminAlert', 'Mohon isi semua field!', 'error');
+                return;
+            }
+
+            if (allSymptoms.find(s => s.id === id)) {
+                showAlert('adminAlert', 'Gejala dengan ID tersebut sudah ada!', 'error');
+                return;
+            }
+
+            allSymptoms.push({ id, label });
+            saveData();
+            showAlert('adminAlert', 'Gejala berhasil ditambahkan!', 'success');
+            document.getElementById('symptomId').value = '';
+            document.getElementById('symptomLabel').value = '';
+            renderAdminData();
+        }
+
+        // Delete Symptom
+        function deleteSymptom(id) {
+            if (confirm('Yakin ingin menghapus gejala ini?')) {
+                allSymptoms = allSymptoms.filter(s => s.id !== id);
+                // Remove from training data
+                trainingData.forEach(data => {
+                    data.symptoms = data.symptoms.filter(s => s !== id);
+                });
+                saveData();
+                showAlert('adminAlert', 'Gejala berhasil dihapus!', 'success');
+                renderAdminData();
+            }
+        }
+
+        // Add Disease
+        function addDisease() {
+            const name = document.getElementById('diseaseName').value.trim();
+            const advice = document.getElementById('diseaseAdvice').value.trim();
+
+            if (!name || !advice) {
+                showAlert('adminAlert', 'Mohon isi semua field!', 'error');
+                return;
+            }
+
+            if (diseaseAdvice[name]) {
+                showAlert('adminAlert', 'Penyakit sudah ada!', 'error');
+                return;
+            }
+
+            diseaseAdvice[name] = advice;
+            saveData();
+            showAlert('adminAlert', 'Penyakit berhasil ditambahkan!', 'success');
+            document.getElementById('diseaseName').value = '';
+            document.getElementById('diseaseAdvice').value = '';
+            renderAdminData();
+        }
+
+        // Delete Disease
+        function deleteDisease(name) {
+            if (confirm('Yakin ingin menghapus penyakit ini?')) {
+                delete diseaseAdvice[name];
+                trainingData = trainingData.filter(d => d.disease !== name);
+                saveData();
+                showAlert('adminAlert', 'Penyakit berhasil dihapus!', 'success');
+                renderAdminData();
+            }
+        }
+
+        // Add Training Data
+        function addTrainingData() {
+            const disease = document.getElementById('trainingDisease').value;
+            const checkboxes = document.querySelectorAll('#trainingSymptoms input[type="checkbox"]:checked');
+            const symptoms = Array.from(checkboxes).map(cb => cb.value);
+
+            if (!disease || symptoms.length === 0) {
+                showAlert('adminAlert', 'Mohon pilih penyakit dan minimal 1 gejala!', 'error');
+                return;
+            }
+
+            trainingData.push({ disease, symptoms });
+            saveData();
+            showAlert('adminAlert', 'Data training berhasil ditambahkan!', 'success');
+            
+            // Reset form
+            document.getElementById('trainingDisease').value = '';
+            document.querySelectorAll('#trainingSymptoms input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            renderAdminData();
+        }
+
+        // Delete Training Data
+        function deleteTrainingData(index) {
+            if (confirm('Yakin ingin menghapus data training ini?')) {
+                trainingData.splice(index, 1);
+                saveData();
+                showAlert('adminAlert', 'Data training berhasil dihapus!', 'success');
+                renderAdminData();
+            }
+        }
+
+        // Render Admin Data
+        function renderAdminData() {
+            // Render Symptoms Table
+            const symptomsTable = document.getElementById('symptomsTableBody');
+            symptomsTable.innerHTML = allSymptoms.map((symptom, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${symptom.id}</td>
+                    <td>${symptom.label}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteSymptom('${symptom.id}')">🗑️ Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Render Diseases Table
+            const diseasesTable = document.getElementById('diseasesTableBody');
+            diseasesTable.innerHTML = Object.entries(diseaseAdvice).map(([disease, advice], index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${disease}</td>
+                    <td>${advice.substring(0, 50)}...</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteDisease('${disease}')">🗑️ Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Render Training Data Table
+            const trainingTable = document.getElementById('trainingTableBody');
+            trainingTable.innerHTML = trainingData.map((data, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${data.disease}</td>
+                    <td>${data.symptoms.map(s => {
+                        const symptom = allSymptoms.find(sym => sym.id === s);
+                        return symptom ? symptom.label : s;
+                    }).join(', ')}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteTrainingData(${index})">🗑️ Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Training Form
+        function renderTrainingForm() {
+            // Populate disease dropdown
+            const diseaseSelect = document.getElementById('trainingDisease');
+            diseaseSelect.innerHTML = '<option value="">-- Pilih Penyakit --</option>' +
+                Object.keys(diseaseAdvice).map(disease => 
+                    `<option value="${disease}">${disease}</option>`
+                ).join('');
+
+            // Populate symptoms checkboxes
+            const symptomsDiv = document.getElementById('trainingSymptoms');
+            symptomsDiv.innerHTML = allSymptoms.map(symptom => `
+                <div class="checkbox-item">
+                    <input type="checkbox" id="train_${symptom.id}" value="${symptom.id}">
+                    <label for="train_${symptom.id}">${symptom.label}</label>
                 </div>
-            `).join('')}
-            <div class="advice-box">
-                <strong>💡 Saran untuk ${topDisease}:</strong>
-                <p>${advice}</p>
-            </div>
-        `;
-        resultDiv.classList.add('show');
-    }
+            `).join('');
+        }
 
-    // Inisialisasi
-    renderSymptoms();
+        // Render User Symptoms
+        function renderUserSymptoms() {
+            const grid = document.getElementById('symptomsGrid');
+            grid.innerHTML = allSymptoms.map(symptom => `
+                <div class="symptom-item">
+                    <input type="checkbox" id="user_${symptom.id}" value="${symptom.id}">
+                    <label for="user_${symptom.id}">${symptom.label}</label>
+                </div>
+            `).join('');
+        }
+
+        // Naive Bayes Algorithm
+        function calculateNaiveBayes(selectedSymptoms) {
+            const diseases = [...new Set(trainingData.map(d => d.disease))];
+            const results = {};
+
+            diseases.forEach(disease => {
+                const diseaseCount = trainingData.filter(d => d.disease === disease).length;
+                const priorProb = diseaseCount / trainingData.length;
+
+                let likelihood = 1;
+                selectedSymptoms.forEach(symptom => {
+                    const symptomInDisease = trainingData.filter(d =>
+                        d.disease === disease && d.symptoms.includes(symptom)
+                    ).length;
+
+                    const prob = (symptomInDisease + 1) / (diseaseCount + 2);
+                    likelihood *= prob;
+                });
+
+                results[disease] = likelihood * priorProb;
+            });
+
+            const total = Object.values(results).reduce((a, b) => a + b, 0);
+            if (total > 0) {
+                Object.keys(results).forEach(disease => {
+                    results[disease] = (results[disease] / total) * 100;
+                });
+            }
+
+            return results;
+        }
+
+        // Predict Disease
+        function predictDisease() {
+            const selectedSymptoms = allSymptoms
+                .filter(symptom => document.getElementById('user_' + symptom.id).checked)
+                .map(symptom => symptom.id);
+
+            if (selectedSymptoms.length === 0) {
+                alert('⚠️ Silakan pilih minimal satu gejala!');
+                return;
+            }
+
+            const predictions = calculateNaiveBayes(selectedSymptoms);
+            const sortedPredictions = Object.entries(predictions)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+
+            if (sortedPredictions.length === 0) {
+                alert('Tidak ada data penyakit yang cocok dengan gejala yang dipilih.');
+                return;
+            }
+
+            const topDisease = sortedPredictions[0][0];
+            const advice = diseaseAdvice[topDisease] || 'Segera konsultasi dengan dokter untuk pemeriksaan lebih lanjut.';
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h3>📊 Hasil Prediksi</h3>
+                <p style="margin-bottom: 15px; font-size: 14px;">Berdasarkan gejala yang Anda pilih:</p>
+                ${sortedPredictions.map(([disease, prob]) => `
+                    <div class="disease-result">
+                        <div class="disease-name">${disease}</div>
+                        <div class="probability">Probabilitas: ${prob.toFixed(2)}%</div>
+                    </div>
+                `).join('')}
+                <div class="advice-box">
+                    <strong>💡 Saran untuk ${topDisease}:</strong>
+                    <p>${advice}</p>
+                </div>
+            `;
+            resultDiv.classList.add('show');
+        }
+
+        // Initialize
+        window.onload = function() {
+            showPage('login');
+        };
     </script>
-
 </body>
 </html>
