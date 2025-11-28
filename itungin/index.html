@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itungin - Manajemen Keuangan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-down {
+            animation: fadeInDown 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // Icon Component (SVG Icons)
+        const Icon = ({ name, className = "w-5 h-5" }) => {
+            const icons = {
+                'dollar-sign': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+                'bar-chart': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+                'wallet': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>,
+                'shopping-cart': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
+                'trending-up': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>,
+                'trending-down': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" /></svg>,
+                'file-text': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
+                'package': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>,
+                'plus': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>,
+                'search': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
+                'x': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>,
+                'trash': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>,
+                'alert': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>,
+                'refresh': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>,
+                'download': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>,
+                'calendar': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>,
+            };
+            return icons[name] || null;
+        };
+
+        // Format Currency
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        };
+
+        // Main App
+        function App() {
+            const [activeMenu, setActiveMenu] = useState('dashboard');
+            
+            // Initialize from localStorage
+            const [transactions, setTransactions] = useState(() => {
+                const saved = localStorage.getItem('itungin_transactions');
+                return saved ? JSON.parse(saved) : [
+                    { id: 1, date: '2024-11-20', type: 'income', category: 'Penjualan', productId: 1, productName: 'Laptop Gaming', quantity: 1, amount: 15000000, description: 'Penjualan laptop gaming' },
+                    { id: 2, date: '2024-11-19', type: 'expense', category: 'Operasional', productId: null, productName: '-', quantity: 0, amount: 2500000, description: 'Sewa kantor bulanan' },
+                    { id: 3, date: '2024-11-18', type: 'income', category: 'Penjualan', productId: 2, productName: 'Smartphone', quantity: 2, amount: 8000000, description: 'Penjualan smartphone' },
+                ];
+            });
+
+            const [products, setProducts] = useState(() => {
+                const saved = localStorage.getItem('itungin_products');
+                return saved ? JSON.parse(saved) : [
+                    { id: 1, name: 'Laptop Gaming', category: 'Elektronik', stock: 4, price: 15000000, sold: 13, minStock: 2 },
+                    { id: 2, name: 'Smartphone', category: 'Elektronik', stock: 13, price: 4000000, sold: 30, minStock: 5 },
+                    { id: 3, name: 'Mouse Wireless', category: 'Aksesoris', stock: 60, price: 250000, sold: 45, minStock: 10 },
+                    { id: 4, name: 'Keyboard Mechanical', category: 'Aksesoris', stock: 18, price: 1500000, sold: 20, minStock: 5 },
+                    { id: 5, name: 'Monitor 27"', category: 'Elektronik', stock: 8, price: 3500000, sold: 15, minStock: 3 },
+                ];
+            });
+
+            const [showAddTransaction, setShowAddTransaction] = useState(false);
+            const [showAddProduct, setShowAddProduct] = useState(false);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [filterType, setFilterType] = useState('');
+            const [notification, setNotification] = useState(null);
+
+            // Save to localStorage
+            useEffect(() => {
+                localStorage.setItem('itungin_transactions', JSON.stringify(transactions));
+            }, [transactions]);
+
+            useEffect(() => {
+                localStorage.setItem('itungin_products', JSON.stringify(products));
+            }, [products]);
+
+            // Show notification
+            const showNotification = (message, type = 'success') => {
+                setNotification({ message, type });
+                setTimeout(() => setNotification(null), 3000);
+            };
+
+            // Reset data
+            const resetAllData = () => {
+                if (confirm('⚠️ PERINGATAN: Semua data akan dihapus!\n\nYakin ingin reset?')) {
+                    localStorage.removeItem('itungin_transactions');
+                    localStorage.removeItem('itungin_products');
+                    window.location.reload();
+                }
+            };
+
+            // Calculate stats
+            const stats = useMemo(() => {
+                const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                const expense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                const profit = income - expense;
+                const totalProducts = products.reduce((sum, p) => sum + p.stock, 0);
+                return { income, expense, profit, totalProducts };
+            }, [transactions, products]);
+
+            // Filter transactions
+            const filteredTransactions = useMemo(() => {
+                return transactions.filter(t => {
+                    const matchSearch = t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                      t.productName.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchType = !filterType || t.type === filterType;
+                    return matchSearch && matchType;
+                });
+            }, [transactions, searchTerm, filterType]);
+
+            // Add transaction
+            const addTransaction = (formData) => {
+                const newTransaction = {
+                    id: Math.max(...transactions.map(t => t.id), 0) + 1,
+                    date: formData.date,
+                    type: formData.type,
+                    category: formData.category,
+                    productId: formData.productId ? parseInt(formData.productId) : null,
+                    productName: formData.productName || '-',
+                    quantity: parseInt(formData.quantity) || 0,
+                    amount: parseFloat(formData.amount),
+                    description: formData.description
+                };
+
+                // Update stock
+                if (formData.productId) {
+                    const productId = parseInt(formData.productId);
+                    const product = products.find(p => p.id === productId);
+                    const quantity = parseInt(formData.quantity) || 0;
+
+                    if (formData.type === 'income' && product.stock < quantity) {
+                        showNotification('❌ Stok tidak mencukupi!', 'error');
+                        return;
+                    }
+                    
+                    setProducts(prev => prev.map(p => {
+                        if (p.id === productId) {
+                            if (formData.type === 'income') {
+                                return { ...p, stock: p.stock - quantity, sold: p.sold + quantity };
+                            } else if (formData.category === 'Pembelian') {
+                                return { ...p, stock: p.stock + quantity };
+                            }
+                        }
+                        return p;
+                    }));
+                }
+
+                setTransactions([newTransaction, ...transactions]);
+                setShowAddTransaction(false);
+                showNotification('✅ Transaksi berhasil ditambahkan!');
+            };
+
+            // Delete transaction
+            const deleteTransaction = (id) => {
+                if (confirm('Yakin ingin menghapus?')) {
+                    const transaction = transactions.find(t => t.id === id);
+                    
+                    if (transaction && transaction.productId) {
+                        setProducts(prev => prev.map(p => {
+                            if (p.id === transaction.productId) {
+                                if (transaction.type === 'income') {
+                                    return { ...p, stock: p.stock + transaction.quantity, sold: Math.max(0, p.sold - transaction.quantity) };
+                                } else if (transaction.category === 'Pembelian') {
+                                    return { ...p, stock: Math.max(0, p.stock - transaction.quantity) };
+                                }
+                            }
+                            return p;
+                        }));
+                    }
+
+                    setTransactions(transactions.filter(t => t.id !== id));
+                    showNotification('🗑️ Transaksi dihapus!');
+                }
+            };
+
+            // Add product
+            const addProduct = (formData) => {
+                const newProduct = {
+                    id: Math.max(...products.map(p => p.id), 0) + 1,
+                    name: formData.name,
+                    category: formData.category,
+                    price: parseFloat(formData.price),
+                    stock: parseInt(formData.stock),
+                    minStock: parseInt(formData.minStock) || 5,
+                    sold: 0
+                };
+                setProducts([...products, newProduct]);
+                setShowAddProduct(false);
+                showNotification('✅ Produk berhasil ditambahkan!');
+            };
+
+            // Delete product
+            const deleteProduct = (id) => {
+                if (confirm('Yakin hapus produk?')) {
+                    setProducts(products.filter(p => p.id !== id));
+                    showNotification('🗑️ Produk dihapus!');
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {notification && (
+                        <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg ${
+                            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                        } text-white animate-fade-in-down`}>
+                            {notification.message}
+                        </div>
+                    )}
+
+                    <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} resetAllData={resetAllData} />
+                    
+                    <div className="ml-64 p-8">
+                        <div className="max-w-7xl mx-auto">
+                            {activeMenu === 'dashboard' && <Dashboard stats={stats} transactions={transactions} products={products} />}
+                            {activeMenu === 'transactions' && <Transactions transactions={filteredTransactions} setShowAddTransaction={setShowAddTransaction} deleteTransaction={deleteTransaction} searchTerm={searchTerm} setSearchTerm={setSearchTerm} filterType={filterType} setFilterType={setFilterType} />}
+                            {activeMenu === 'products' && <Products products={products} setShowAddProduct={setShowAddProduct} deleteProduct={deleteProduct} />}
+                            {activeMenu === 'analysis' && <Analysis stats={stats} products={products} />}
+                            {activeMenu === 'reports' && <Reports stats={stats} products={products} />}
+                        </div>
+                    </div>
+
+                    {showAddTransaction && <TransactionModal products={products} onClose={() => setShowAddTransaction(false)} onSave={addTransaction} />}
+                    {showAddProduct && <ProductModal onClose={() => setShowAddProduct(false)} onSave={addProduct} />}
+                </div>
+            );
+        }
+
+        // Sidebar
+        function Sidebar({ activeMenu, setActiveMenu, resetAllData }) {
+            const menuItems = [
+                { id: 'dashboard', icon: 'bar-chart', label: 'Dashboard' },
+                { id: 'transactions', icon: 'wallet', label: 'Transaksi' },
+                { id: 'products', icon: 'shopping-cart', label: 'Produk' },
+                { id: 'analysis', icon: 'trending-up', label: 'Analisis' },
+                { id: 'reports', icon: 'file-text', label: 'Laporan' },
+            ];
+
+            return (
+                <div className="fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-blue-600 to-blue-800 text-white p-6 shadow-xl z-50">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold flex items-center gap-2">
+                            <Icon name="dollar-sign" className="w-8 h-8" />
+                            Itungin
+                        </h1>
+                        <p className="text-sm text-blue-200 mt-1">Manajemen Keuangan</p>
+                        <div className="mt-2 text-xs bg-blue-700 px-2 py-1 rounded">
+                            💾 Data Tersimpan Otomatis
+                        </div>
+                    </div>
+                    
+                    <nav className="space-y-2">
+                        {menuItems.map((menu) => (
+                            <button
+                                key={menu.id}
+                                onClick={() => setActiveMenu(menu.id)}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                                    activeMenu === menu.id ? 'bg-white text-blue-600 shadow-lg' : 'hover:bg-blue-700'
+                                }`}
+                            >
+                                <Icon name={menu.icon} />
+                                <span className="font-medium">{menu.label}</span>
+                            </button>
+                        ))}
+                    </nav>
+
+                    <div className="absolute bottom-6 left-6 right-6">
+                        <button onClick={resetAllData} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm">
+                            <Icon name="refresh" className="w-4 h-4" />
+                            Reset Data
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Dashboard
+        function Dashboard({ stats, transactions, products }) {
+            const lowStockProducts = products.filter(p => p.stock <= p.minStock);
+
+            useEffect(() => {
+                const ctx = document.getElementById('dashboardChart');
+                if (ctx) {
+                    const chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep'],
+                            datasets: [
+                                {
+                                    label: 'Pendapatan',
+                                    data: [45000000, 52000000, 48000000, 61000000, 58000000, 65000000],
+                                    backgroundColor: 'rgb(16, 185, 129)',
+                                },
+                                {
+                                    label: 'Pengeluaran',
+                                    data: [28000000, 31000000, 29000000, 35000000, 33000000, 38000000],
+                                    backgroundColor: 'rgb(239, 68, 68)',
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                        }
+                    });
+                    return () => chart.destroy();
+                }
+            }, []);
+
+            return (
+                <div className="space-y-6">
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                            <strong>💾 Data Persistent:</strong> Semua data tersimpan di Local Storage browser Anda
+                        </p>
+                    </div>
+
+                    {lowStockProducts.length > 0 && (
+                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Icon name="alert" className="w-5 h-5 text-yellow-600" />
+                                <h3 className="font-semibold text-yellow-800">⚠️ Stok Rendah!</h3>
+                            </div>
+                            <p className="text-sm text-yellow-700">
+                                {lowStockProducts.length} produk: <strong>{lowStockProducts.map(p => p.name).join(', ')}</strong>
+                            </p>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <StatCard icon="trending-up" title="Pendapatan" value={formatCurrency(stats.income)} color="from-green-500 to-green-600" />
+                        <StatCard icon="trending-down" title="Pengeluaran" value={formatCurrency(stats.expense)} color="from-red-500 to-red-600" />
+                        <StatCard icon="wallet" title="Profit" value={formatCurrency(stats.profit)} color="from-blue-500 to-blue-600" />
+                        <StatCard icon="package" title="Total Stok" value={stats.totalProducts} color="from-purple-500 to-purple-600" />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h3 className="text-lg font-semibold mb-4">Transaksi Terbaru</h3>
+                            <div className="space-y-3">
+                                {transactions.slice(0, 5).map((t) => (
+                                    <div key={t.id} className="flex justify-between border-b pb-2">
+                                        <div>
+                                            <p className="font-semibold text-sm">{t.description}</p>
+                                            <p className="text-xs text-gray-500">{t.date}</p>
+                                        </div>
+                                        <p className={`font-bold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                                            {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function StatCard({ icon, title, value, color }) {
+            return (
+                <div className={`bg-gradient-to-br ${color} rounded-xl p-6 text-white shadow-lg`}>
+                    <div className="flex items-center justify-between mb-4">
+                        <Icon name={icon} className="w-8 h-8" />
+                        <span className="text-sm opacity-90">{title}</span>
+                    </div>
+                    <div className="text-2xl font-bold">{value}</div>
+                </div>
+            );
+        }
+
+        // Transactions
+        function Transactions({ transactions, setShowAddTransaction, deleteTransaction, searchTerm, setSearchTerm, filterType, setFilterType }) {
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold">Transaksi</h2>
+                        <button onClick={() => setShowAddTransaction(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                            <Icon name="plus" />
+                            Tambah
+                        </button>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="flex gap-4 mb-6">
+                            <div className="flex-1 relative">
+                                <Icon name="search" className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                <input type="text" placeholder="Cari..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border rounded-lg" />
+                            </div>
+                            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="px-4 py-2 border rounded-lg">
+                                <option value="">Semua</option>
+                                <option value="income">Masuk</option>
+                                <option value="expense">Keluar</option>
+                            </select>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr className="text-left text-sm">
+                                        <th className="p-3">Tanggal</th>
+                                        <th className="p-3">Deskripsi</th>
+                                        <th className="p-3">Produk</th>
+                                        <th className="p-3">Qty</th>
+                                        <th className="p-3">Tipe</th>
+                                        <th className="p-3 text-right">Jumlah</th>
+                                        <th className="p-3">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-sm">
+                                    {transactions.map((t) => (
+                                        <tr key={t.id} className="border-b hover:bg-gray-50">
+                                            <td className="p-3">{t.date}</td>
+                                            <td className="p-3">{t.description}</td>
+                                            <td className="p-3">{t.productName}</td>
+                                            <td className="p-3">{t.quantity || '-'}</td>
+                                            <td className="p-3">
+                                                <span className={`px-2 py-1 rounded text-xs ${t.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                    {t.type === 'income' ? 'Masuk' : 'Keluar'}
+                                                </span>
+                                            </td>
+                                            <td className={`p-3 text-right font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                                                {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                                            </td>
+                                            <td className="p-3">
+                                                <button onClick={() => deleteTransaction(t.id)} className="text-red-600 hover:text-red-800">
+                                                    <Icon name="trash" className="w-4 h-4" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Products
+        function Products({ products, setShowAddProduct, deleteProduct }) {
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold">Produk</h2>
+                        <button onClick={() => setShowAddProduct(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                            <Icon name="plus" />
+                            Tambah
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {products.map((product) => (
+                            <div key={product.id} className={`bg-white rounded-xl shadow-lg p-6 ${product.stock <= product.minStock ? 'border-2 border-yellow-400' : ''}`}>
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 className="font-semibold text-lg">{product.name}</h3>
+                                        <p className="text-sm text-gray-500">{product.category}</p>
+                                    </div>
+                                    <Icon name="package" className="w-8 h-8 text-blue-500" />
+                                </div>
+                                
+                                {product.stock <= product.minStock && (
+                                    <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold mb-3 flex items-center gap-1">
+                                        <Icon name="alert" className="w-3 h-3" />
+                                        Stok Rendah!
+                                    </div>
+                                )}
+                                
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Harga:</span>
+                                        <span className="font-semibold text-blue-600">{formatCurrency(product.price)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Stok:</span>
+                                        <span className={`font-semibold ${product.stock <= product.minStock ? 'text-red-600' : 'text-green-600'}`}>
+                                            {product.stock} unit
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Terjual:</span>
+                                        <span className="font-semibold">{product.sold} unit</span>
+                                    </div>
+                                </div>
+                                
+                                <div className="mt-4 pt-4 border-t">
+                                    <div className="text-sm text-gray-600">Revenue:</div>
+                                    <div className="text-lg font-bold text-green-600">{formatCurrency(product.price * product.sold)}</div>
+                                </div>
+                                
+                                <button onClick={() => deleteProduct(product.id)} className="mt-4 w-full py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 flex items-center justify-center gap-2">
+                                    <Icon name="trash" className="w-4 h-4" />
+                                    Hapus
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Analysis
+        function Analysis({ stats, products }) {
+            const topProducts = [...products].sort((a, b) => b.sold - a.sold).slice(0, 5);
+            const profitMargin = stats.income > 0 ? ((stats.profit / stats.income) * 100).toFixed(1) : 0;
+
+            return (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold">Analisis Keuangan</h2>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <h3 className="text-lg font-semibold mb-4">Ringkasan Analisis</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="p-4 bg-green-50 rounded-lg">
+                                <div className="text-sm text-gray-600 mb-1">Total Pendapatan</div>
+                                <div className="text-2xl font-bold text-green-600">{formatCurrency(stats.income)}</div>
+                            </div>
+                            <div className="p-4 bg-red-50 rounded-lg">
+                                <div className="text-sm text-gray-600 mb-1">Total Pengeluaran</div>
+                                <div className="text-2xl font-bold text-red-600">{formatCurrency(stats.expense)}</div>
+                            </div>
+                            <div className="p-4 bg-blue-50 rounded-lg">
+                                <div className="text-sm text-gray-600 mb-1">Margin Profit</div>
+                                <div className="text-2xl font-bold text-blue-600">{profitMargin}%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <h3 className="text-lg font-semibold mb-4">Top 5 Produk Terlaris</h3>
+                        <div className="space-y-4">
+                            {topProducts.map((product, index) => (
+                                <div key={product.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold">
+                                            {index + 1}
+                                        </div>
+                                        <div>
+                                            <div className="font-semibold">{product.name}</div>
+                                            <div className="text-sm text-gray-500">{product.sold} unit terjual</div>
+                                        </div>
+                                    </div>
+                                    <div className="font-semibold text-green-600">{formatCurrency(product.price * product.sold)}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Reports
+        function Reports({ stats, products }) {
+            const totalInventory = products.reduce((sum, p) => sum + (p.price * p.stock), 0);
+            const totalAssets = stats.profit + totalInventory;
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold">Laporan Keuangan</h2>
+                        <button onClick={() => alert('Fitur export PDF!')} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2">
+                            <Icon name="download" />
+                            Export
+                        </button>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <h3 className="text-lg font-semibold mb-4">Laporan Laba Rugi</h3>
+                        <div className="space-y-3">
+                            <div className="flex justify-between py-3 border-b">
+                                <span className="font-semibold">Pendapatan</span>
+                                <span className="font-semibold text-green-600">{formatCurrency(stats.income)}</span>
+                            </div>
+                            <div className="flex justify-between py-3 border-b">
+                                <span className="font-semibold">Pengeluaran</span>
+                                <span className="font-semibold text-red-600">{formatCurrency(stats.expense)}</span>
+                            </div>
+                            <div className="flex justify-between py-3 bg-blue-50 px-4 rounded-lg">
+                                <span className="font-bold text-lg">Laba Bersih</span>
+                                <span className="font-bold text-lg text-blue-600">{formatCurrency(stats.profit)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <h3 className="text-lg font-semibold mb-4">Neraca Keuangan</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 className="font-semibold mb-3 text-gray-700">Aset</h4>
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span>Kas</span>
+                                        <span className="font-semibold">{formatCurrency(stats.profit)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Persediaan</span>
+                                        <span className="font-semibold">{formatCurrency(totalInventory)}</span>
+                                    </div>
+                                    <div className="flex justify-between pt-2 border-t font-bold">
+                                        <span>Total Aset</span>
+                                        <span className="text-green-600">{formatCurrency(totalAssets)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold mb-3 text-gray-700">Kewajiban & Modal</h4>
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span>Hutang</span>
+                                        <span className="font-semibold">{formatCurrency(0)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Modal</span>
+                                        <span className="font-semibold">{formatCurrency(totalAssets)}</span>
+                                    </div>
+                                    <div className="flex justify-between pt-2 border-t font-bold">
+                                        <span>Total</span>
+                                        <span className="text-blue-600">{formatCurrency(totalAssets)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Transaction Modal
+        function TransactionModal({ products, onClose, onSave }) {
+            const [formData, setFormData] = React.useState({
+                date: new Date().toISOString().split('T')[0],
+                type: '',
+                category: '',
+                productId: '',
+                productName: '',
+                quantity: '',
+                amount: '',
+                description: ''
+            });
+
+            const [selectedProduct, setSelectedProduct] = React.useState(null);
+
+            const handleProductChange = (e) => {
+                const productId = e.target.value;
+                if (productId) {
+                    const product = products.find(p => p.id === parseInt(productId));
+                    setSelectedProduct(product);
+                    setFormData({...formData, productId, productName: product.name});
+                } else {
+                    setSelectedProduct(null);
+                    setFormData({...formData, productId: '', productName: '', quantity: '', amount: ''});
+                }
+            };
+
+            const handleQuantityChange = (e) => {
+                const quantity = parseInt(e.target.value) || 0;
+                if (selectedProduct && quantity > 0) {
+                    setFormData({...formData, quantity, amount: selectedProduct.price * quantity});
+                } else {
+                    setFormData({...formData, quantity});
+                }
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (formData.type === 'income' && selectedProduct && parseInt(formData.quantity) > selectedProduct.stock) {
+                    alert(`❌ Stok tidak cukup!\nTersedia: ${selectedProduct.stock}`);
+                    return;
+                }
+                onSave(formData);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Tambah Transaksi</h3>
+                            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                                <Icon name="x" className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Tanggal</label>
+                                    <input type="date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} required className="w-full px-3 py-2 border rounded-lg" />
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Tipe</label>
+                                    <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} required className="w-full px-3 py-2 border rounded-lg">
+                                        <option value="">Pilih Tipe</option>
+                                        <option value="income">💰 Pemasukan</option>
+                                        <option value="expense">💸 Pengeluaran</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Kategori</label>
+                                    <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} required className="w-full px-3 py-2 border rounded-lg">
+                                        <option value="">Pilih Kategori</option>
+                                        <option value="Penjualan">Penjualan</option>
+                                        <option value="Operasional">Operasional</option>
+                                        <option value="Pembelian">Pembelian</option>
+                                        <option value="Gaji">Gaji</option>
+                                        <option value="Lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Produk (Opsional)</label>
+                                    <select value={formData.productId} onChange={handleProductChange} className="w-full px-3 py-2 border rounded-lg">
+                                        <option value="">Pilih Produk</option>
+                                        {products.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name} (Stok: {p.stock})</option>
+                                        ))}
+                                    </select>
+                                    {selectedProduct && (
+                                        <div className="mt-2 p-3 bg-blue-50 rounded-lg text-sm">
+                                            <strong>Stok:</strong> {selectedProduct.stock} | <strong>Harga:</strong> {formatCurrency(selectedProduct.price)}
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {selectedProduct && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Jumlah (Qty)</label>
+                                        <input type="number" value={formData.quantity} onChange={handleQuantityChange} min="1" max={formData.type === 'income' ? selectedProduct.stock : undefined} placeholder="0" className="w-full px-3 py-2 border rounded-lg" />
+                                    </div>
+                                )}
+                                
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Jumlah (Rp)</label>
+                                    <input type="number" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} required min="0" placeholder="0" readOnly={selectedProduct && formData.quantity > 0} className="w-full px-3 py-2 border rounded-lg" />
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Deskripsi</label>
+                                    <textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} required rows="3" placeholder="Deskripsi" className="w-full px-3 py-2 border rounded-lg"></textarea>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">Batal</button>
+                                <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // Product Modal
+        function ProductModal({ onClose, onSave }) {
+            const [formData, setFormData] = React.useState({
+                name: '',
+                category: '',
+                price: '',
+                stock: '',
+                minStock: '5'
+            });
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSave(formData);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Tambah Produk</h3>
+                            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                                <Icon name="x" className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Nama Produk</label>
+                                    <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required placeholder="Nama produk" className="w-full px-3 py-2 border rounded-lg" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Kategori</label>
+                                    <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} required className="w-full px-3 py-2 border rounded-lg">
+                                        <option value="">Pilih Kategori</option>
+                                        <option value="Elektronik">Elektronik</option>
+                                        <option value="Aksesoris">Aksesoris</option>
+                                        <option value="Fashion">Fashion</option>
+                                        <option value="Makanan">Makanan</option>
+                                        <option value="Lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Harga (Rp)</label>
+                                    <input type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} required min="0" placeholder="0" className="w-full px-3 py-2 border rounded-lg" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Stok Awal</label>
+                                    <input type="number" value={formData.stock} onChange={(e) => setFormData({...formData, stock: e.target.value})} required min="0" placeholder="0" className="w-full px-3 py-2 border rounded-lg" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Min. Stok</label>
+                                    <input type="number" value={formData.minStock} onChange={(e) => setFormData({...formData, minStock: e.target.value})} required min="0" placeholder="5" className="w-full px-3 py-2 border rounded-lg" />
+                                </div>
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">Batal</button>
+                                <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render App
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
