@@ -518,11 +518,11 @@
                 <div id="loginAlert"></div>
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="username" placeholder="Masukkan username">
+                    <input type="text" id="username" placeholder="Masukkan username" maxlength="30">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="password" placeholder="Masukkan password">
+                    <input type="password" id="password" placeholder="Masukkan password" maxlength="30">
                 </div>
                 <button class="btn" onclick="login()">🔐 Login</button>
                 <button class="btn btn-secondary" onclick="showPage('home')">👤 Masuk sebagai User</button>
@@ -582,11 +582,11 @@
                         <div class="form-inline">
                             <div class="form-group">
                                 <label>ID Gejala</label>
-                                <input type="text" id="symptomId" placeholder="contoh: batuk_kering">
+                                <input type="text" id="symptomId" placeholder="contoh: batuk_kering" maxlength="30">
                             </div>
                             <div class="form-group">
                                 <label>Nama Gejala</label>
-                                <input type="text" id="symptomLabel" placeholder="contoh: Batuk Kering">
+                                <input type="text" id="symptomLabel" placeholder="contoh: Batuk Kering" maxlength="30">
                             </div>
                         </div>
                         <button class="btn" onclick="addSymptom()">➕ Tambah Gejala</button>
@@ -610,7 +610,7 @@
                         <h3 style="color: #667eea; margin-bottom: 15px;">Tambah Penyakit Baru</h3>
                         <div class="form-group">
                             <label>Nama Penyakit</label>
-                            <input type="text" id="diseaseName" placeholder="contoh: Demam Berdarah">
+                            <input type="text" id="diseaseName" placeholder="contoh: Demam Berdarah" maxlength="30">
                         </div>
                         <div class="form-group">
                             <label>Saran Pengobatan</label>
